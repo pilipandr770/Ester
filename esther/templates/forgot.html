@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Сброс пароля</h1>
+<form class="card" method="post">{{ csrf_input() }}
+<label>Email</label><input name="email" type="email" required>
+<button>Отправить ссылку</button>
+</form>
+{% endblock %}

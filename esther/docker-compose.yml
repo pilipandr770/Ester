@@ -1,0 +1,91 @@
+x-esther: &esther
+  build: .
+  env_file: .env
+  environment:
+    # пароль БД берём из .env (DB_PASSWORD), он перекрывает DATABASE_URL из env_file
+    DATABASE_URL: postgresql://esther:${DB_PASSWORD:?задайте DB_PASSWORD в .env}@db:5432/esther
+    FLASK_APP: app.py
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: esther
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?задайте DB_PASSWORD в .env}
+      POSTGRES_DB: esther
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U esther -d esther"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  evolution_db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: evo
+      POSTGRES_PASSWORD: ${EVO_DB_PASSWORD:?задайте EVO_DB_PASSWORD в .env}
+      POSTGRES_DB: evo
+    volumes: [evodata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evo -d evo"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  evolution:
+    image: evoapicloud/evolution-api:v2.3.7
+    depends_on:
+      evolution_db: {condition: service_healthy}
+    environment:
+      SERVER_URL: http://evolution:8080
+      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY:?задайте EVOLUTION_API_KEY в .env}
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://evo:${EVO_DB_PASSWORD}@evolution_db:5432/evo
+      WEBHOOK_GLOBAL_ENABLED: "false"
+      QRCODE_LIMIT: "10"
+      # v2.3 по умолчанию ждёт Redis; отдельный Redis не нужен
+      CACHE_REDIS_ENABLED: "false"
+      CACHE_LOCAL_ENABLED: "true"
+    volumes: [evoinstances:/evolution/instances]
+    restart: unless-stopped
+    # порт наружу НЕ публикуем: доступ только из docker-сети
+
+  # одноразово применяет миграции схемы перед стартом web и worker
+  migrate:
+    <<: *esther
+    command: flask db upgrade
+    restart: "no"
+    depends_on:
+      db: {condition: service_healthy}
+
+  web:
+    <<: *esther
+    command: gunicorn -b 0.0.0.0:8000 -w 2 --timeout 120 app:app
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      evolution: {condition: service_started}
+    # только localhost: наружу выставляет reverse proxy с HTTPS
+    ports: ["127.0.0.1:8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  worker:
+    <<: *esther
+    command: python worker.py
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      evolution: {condition: service_started}
+
+volumes:
+  pgdata:
+  evodata:
+  evoinstances:

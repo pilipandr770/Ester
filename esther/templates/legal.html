@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="row" style="margin-top:16px">
+<a class="tag" href="{{ url_for('legal', doc=doc, lang='ru') }}">Русский</a>
+<a class="tag" href="{{ url_for('legal', doc=doc, lang='he') }}">עברית</a>
+<a class="tag" href="{{ url_for('legal', doc=('terms' if doc=='privacy' else 'privacy'), lang=lang) }}">{{ 'Условия' if doc=='privacy' and lang=='ru' else 'Конфиденциальность' if lang=='ru' else ('תנאי שימוש' if doc=='privacy' else 'מדיניות פרטיות') }}</a>
+</div>
+<div class="card" {% if lang=='he' %}dir="rtl" lang="he"{% endif %}>
+<h1 style="margin-top:0">{{ title }}</h1>
+{% for h, t in sections %}<h2 style="margin-top:18px">{{ h }}</h2><p>{{ t }}</p>{% endfor %}
+<p class="mute">{{ 'Черновик, требует проверки юристом.' if lang=='ru' else 'טיוטה הדורשת בדיקת עורך דין.' }}</p>
+</div>
+{% endblock %}

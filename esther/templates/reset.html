@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Новый пароль</h1>
+<form class="card" method="post">{{ csrf_input() }}
+<label>Пароль (от 8 символов)</label><input name="password" type="password" minlength="8" maxlength="128" required>
+<button>Сохранить</button>
+</form>
+{% endblock %}

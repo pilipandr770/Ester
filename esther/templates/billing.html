@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Подписка</h1>
+<div class="card">
+{% if current_user.sub_status in ('active','trialing','past_due') %}
+{% if current_user.sub_status == 'past_due' %}<p class="flash warn">Не удалось списать оплату. Обновите карту, иначе доступ будет отключён.</p>{% endif %}
+<p>✅ Подписка активна · 10 € в месяц.</p>
+<form method="post" action="{{ url_for('billing_portal') }}">{{ csrf_input() }}<button class="sec">Управление подпиской и картой</button></form>
+{% else %}
+{% if current_user.has_access %}<p>Пробный период до {{ current_user.trial_ends_at.strftime('%d.%m.%Y') }}.</p>{% else %}<p>Пробный период закончился.</p>{% endif %}
+<h2>Эстер: 10 € в месяц</h2>
+<form method="post" action="{{ url_for('billing_checkout') }}">{{ csrf_input() }}<button>Оформить подписку</button></form>
+{% if current_user.sub_status in ('past_due','canceled') %}<p class="mute">Статус: {{ current_user.sub_status }}</p>{% endif %}
+{% endif %}
+</div>
+{% endblock %}

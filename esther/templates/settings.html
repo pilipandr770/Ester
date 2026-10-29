@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Настройки</h1>
+<form class="card" method="post">{{ csrf_input() }}
+<label>Часовой пояс</label>
+<select name="timezone">{% for z in ['Asia/Jerusalem','Europe/Berlin','Europe/Vienna','Europe/Warsaw','Europe/Prague','Europe/London','Europe/Madrid','Europe/Rome','Europe/Athens','Europe/Kyiv','America/New_York','America/Toronto','Asia/Dubai'] %}<option {{ 'selected' if current_user.timezone==z }}>{{ z }}</option>{% endfor %}</select>
+<label>Время вечернего разбора</label><input name="digest_time" type="time" value="{{ current_user.digest_time }}">
+<label>Напоминать за (часов до события)</label><input name="remind_hours_before" type="number" min="1" max="72" value="{{ current_user.remind_hours_before }}">
+<label>Ваш номер WhatsApp для напоминаний (с кодом страны, только цифры)</label>
+<input name="phone" placeholder="972501234567" value="{{ current_user.phone or '' }}">
+<p class="mute">Напоминания приходят сообщением в WhatsApp на этот номер.</p>
+<button>Сохранить</button></form>
+<div class="card"><h2>Мои данные</h2><p class="mute">Скачать все ваши данные (чаты, переводы, события, разборы) одним JSON-файлом.</p><a class="btn sec" href="{{ url_for('account_export') }}">Скачать данные</a></div>
+<form class="card" method="post" action="{{ url_for('account_delete') }}" onsubmit="return confirm('Удалить аккаунт и все данные безвозвратно?')">{{ csrf_input() }}
+<h2>Удалить аккаунт</h2><p class="mute">Отключает WhatsApp и стирает все сообщения, разборы и события.</p><button class="danger">Удалить всё</button></form>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Календарь</h1>
+{% for e in events %}
+<div class="card {{ 'done' if e.done }}">
+<div class="row"><span style="font-size:22px">{{ icons.get(e.kind,'📅') }}</span>
+<div><b>{{ e.title }}</b>{% if e.amount %} <span class="tag">{{ e.amount }}</span>{% endif %}<br>
+<span class="mute">{{ e.due.strftime('%d.%m.%Y') }}{{ '' if e.all_day else e.due.strftime(' %H:%M') }}{% if e.details %} · {{ e.details }}{% endif %}</span></div>
+<form method="post" action="{{ url_for('event_action', eid=e.id, action='done') }}" style="margin-left:auto">{{ csrf_input() }}<button class="sec">{{ 'Вернуть' if e.done else 'Готово' }}</button></form>
+<form method="post" action="{{ url_for('event_action', eid=e.id, action='delete') }}">{{ csrf_input() }}<button class="danger">✕</button></form></div>
+</div>
+{% else %}<div class="card mute">Событий пока нет.</div>{% endfor %}
+
+<form class="card" method="post" action="{{ url_for('event_add') }}">{{ csrf_input() }}
+<h2>Добавить вручную</h2>
+<input name="title" placeholder="Что" required>
+<div class="row"><input type="date" name="date" required style="width:auto"><input type="time" name="time" style="width:auto">
+<select name="kind" style="width:auto"><option value="event">Событие</option><option value="payment">Оплата</option><option value="bring">Принести</option><option value="dress">Дресс-код</option><option value="deadline">Дедлайн</option></select></div>
+<input name="details" placeholder="Детали (необязательно)"><button>Добавить</button></form>
+
+<div class="card"><h2>Календарь в телефоне</h2>
+<p class="mute">Добавьте эту ссылку в Google или Apple Calendar как «подписку по URL». Ссылка секретная, никому не передавайте.</p>
+<input readonly value="{{ ics }}" onclick="this.select()">
+<form method="post" action="{{ url_for('ics_rotate') }}" onsubmit="return confirm('Старая ссылка перестанет работать. Продолжить?')">{{ csrf_input() }}<button class="sec">Сменить ссылку</button></form></div>
+{% endblock %}

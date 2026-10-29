@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Эстер{% endblock %}</title>
+<style>
+:root{--bg:#faf7f2;--card:#fff;--ink:#2b2a33;--mute:#6f6b7a;--acc:#7b5ea7;--acc2:#efe8f8;--ok:#2e7d5b;--err:#b3261e;--warn:#9a6700}
+*{box-sizing:border-box}body{margin:0;font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px}
+nav{background:var(--card);border-bottom:1px solid #eee;position:sticky;top:0;z-index:5}
+nav .wrap{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 16px}
+nav a{color:var(--ink);text-decoration:none;padding:6px 10px;border-radius:8px}nav a:hover{background:var(--acc2)}
+nav .logo{font-weight:700;color:var(--acc);margin-right:auto;font-size:20px}
+.card{background:var(--card);border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+h1{font-size:26px;margin:22px 0 6px}h2{font-size:19px;margin:0 0 8px}
+.mute{color:var(--mute);font-size:14px}
+input,select,textarea,button{font:inherit;padding:10px 12px;border:1px solid #d9d5e0;border-radius:10px;width:100%;margin:4px 0 10px;background:#fff}
+textarea{min-height:90px}
+button,.btn{background:var(--acc);color:#fff;border:0;cursor:pointer;display:inline-block;text-decoration:none;width:auto;padding:10px 18px;border-radius:10px}
+button.sec{background:var(--acc2);color:var(--acc)}button.danger{background:#fbe9e7;color:var(--err)}
+.flash{padding:10px 14px;border-radius:10px;margin:10px 0}.flash.ok{background:#e4f4ec;color:var(--ok)}.flash.err{background:#fde7e5;color:var(--err)}.flash.warn{background:#fff4d6;color:var(--warn)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:0 0 auto}
+.tag{background:var(--acc2);color:var(--acc);border-radius:999px;padding:2px 10px;font-size:13px}
+ul.clean{padding-left:20px;margin:6px 0}
+.done{opacity:.45;text-decoration:line-through}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+<a class="logo" href="/">Эстер</a>
+{% if current_user.is_authenticated %}
+<a href="{{ url_for('dashboard') }}">Лента</a>
+<a href="{{ url_for('calendar') }}">Календарь</a>
+<a href="{{ url_for('chats') }}">Чаты</a>
+<a href="{{ url_for('connect') }}">WhatsApp</a>
+<a href="{{ url_for('settings') }}">Настройки</a>
+<a href="{{ url_for('billing_page') }}">Подписка</a>
+<a href="{{ url_for('logout') }}">Выйти</a>
+{% else %}
+<a href="{{ url_for('login') }}">Войти</a><a class="btn" href="{{ url_for('register') }}">Попробовать</a>
+{% endif %}
+</div></nav>
+<div class="wrap">
+{% with m = get_flashed_messages(with_categories=true) %}{% for c,t in m %}<div class="flash {{c}}">{{t}}</div>{% endfor %}{% endwith %}
+{% block body %}{% endblock %}
+<p class="mute" style="margin:40px 0">Эстер · переводы и саммари родительских чатов · <a href="{{ url_for('legal', doc='terms', lang='ru') }}">Условия</a> · <a href="{{ url_for('legal', doc='privacy', lang='ru') }}">Конфиденциальность</a> · <a href="{{ url_for('legal', doc='privacy', lang='he') }}">עברית</a></p>
+</div>
+</body></html>

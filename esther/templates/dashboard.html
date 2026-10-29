@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Лента</h1>
+{% if not current_user.wa_connected %}
+<div class="flash warn">WhatsApp не подключён. <a href="{{ url_for('connect') }}">Подключить</a></div>{% endif %}
+
+{% if upcoming %}
+<div class="card"><h2>Ближайшее</h2>
+<ul class="clean">{% for e in upcoming %}
+<li><b>{{ e.due.strftime('%d.%m') }}{{ '' if e.all_day else e.due.strftime(' %H:%M') }}</b>: {{ e.title }}{% if e.amount %} <span class="tag">{{ e.amount }}</span>{% endif %}</li>
+{% endfor %}</ul><a href="{{ url_for('calendar') }}">Весь календарь →</a></div>{% endif %}
+
+{% for d in digests %}
+<div class="card">
+<div class="row"><h2 style="margin:0">{{ chat_names.get(d.chat_id, 'Чат') }}</h2><span class="mute">{{ d.day.strftime('%d.%m.%Y') }}</span></div>
+<p>{{ d.summary }}</p>
+{% set imp = d.important|fromjson %}{% if imp %}<b>Нельзя пропустить</b><ul class="clean">{% for i in imp %}<li>{{ i }}</li>{% endfor %}</ul>{% endif %}
+{% set tr = d.terms|fromjson %}{% if tr %}<b>Термины</b><ul class="clean">{% for t in tr %}<li><b>{{ t.term }}</b>: {{ t.meaning }}</li>{% endfor %}</ul>{% endif %}
+</div>
+{% else %}
+<div class="card mute">Разборов пока нет. Первый придёт вечером в {{ current_user.digest_time }} (время {{ current_user.timezone }}), если в выбранных чатах будут сообщения.</div>
+{% endfor %}
+{% endblock %}

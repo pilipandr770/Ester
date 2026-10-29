@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Вход</h1>
+<form class="card" method="post">{{ csrf_input() }}
+<label>Email</label><input name="email" type="email" required>
+<label>Пароль</label><input name="password" type="password" required>
+<button>Войти</button>
+<p class="mute"><a href="{{ url_for('forgot') }}">Забыли пароль?</a></p>
+</form>
+{% endblock %}

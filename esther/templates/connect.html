@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Подключение WhatsApp</h1>
+<div class="card">
+<div id="status" class="mute">Готовим QR-код…</div>
+<img id="qr" style="max-width:280px;display:none;margin:10px 0" alt="QR">
+<p class="mute">WhatsApp на телефоне → Настройки → Связанные устройства → Привязка устройства → наведите камеру.</p>
+<div id="next" style="display:none"><a class="btn" href="{{ url_for('chats') }}">Выбрать чаты →</a></div>
+<form method="post" action="{{ url_for('disconnect') }}" style="margin-top:14px">{{ csrf_input() }}<button class="sec">Отключить WhatsApp</button></form>
+</div>
+<script>
+async function poll(){
+  try{
+    const r = await fetch('/api/qr'); const j = await r.json();
+    const st = document.getElementById('status'), img = document.getElementById('qr');
+    if(j.state==='open'){st.textContent='✅ WhatsApp подключён';img.style.display='none';document.getElementById('next').style.display='block';return;}
+    if(j.qr){img.src=j.qr;img.style.display='block';st.textContent='Отсканируйте QR-код';}
+    else if(j.error){st.textContent='Ошибка связи с WhatsApp-шлюзом, пробуем снова…';}
+  }catch(e){}
+  setTimeout(poll, 6000);
+}
+poll();
+</script>
+{% endblock %}

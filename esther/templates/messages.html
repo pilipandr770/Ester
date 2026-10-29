@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>{{ chat.name }}</h1>
+<p class="mute">Последние 100 сообщений с переводом.</p>
+{% for m in msgs %}
+<div class="card">
+<div class="mute">{{ m.ts.strftime('%d.%m %H:%M') }} · {{ m.sender }} · {{ {'text':'текст','image':'фото','audio':'голосовое'}[m.kind] }} · <span class="tag">{{ m.lang }}</span></div>
+<p style="margin:6px 0"><b>{{ m.translation or m.original }}</b></p>
+{% if m.translation and m.translation != m.original %}<p class="mute" dir="auto" style="margin:0">{{ m.original }}</p>{% endif %}
+</div>
+{% else %}<div class="card mute">Сообщений пока нет.</div>{% endfor %}
+{% endblock %}

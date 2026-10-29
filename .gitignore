@@ -1,0 +1,33 @@
+# секреты и локальные окружения
+.env
+.env.*
+!.env.example
+*.bak
+*.pem
+*.key
+
+# логи и временные файлы
+*.log
+ngrok.log
+stripe_listen.log
+
+# локальные БД
+*.db
+*.sqlite3
+instance/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# docker: локальный override не нужен на других машинах
+docker-compose.override.yml
+
+# IDE / ОС
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

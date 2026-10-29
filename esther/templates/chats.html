@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Отслеживаемые чаты</h1>
+<p class="mute">Эстер читает только эти группы. Личные переписки и остальные чаты игнорируются полностью.</p>
+
+{% for c in chats %}
+<form class="card" method="post" action="{{ url_for('chats_edit', cid=c.id) }}">{{ csrf_input() }}
+<div class="row"><h2 style="margin:0">{{ c.name }}</h2>
+<label class="row" style="margin-left:auto"><input type="checkbox" name="enabled" value="1" {{ 'checked' if c.enabled }} style="width:auto;margin:0"> включён</label></div>
+<label>Что делать с этим чатом (по-русски)</label>
+<textarea name="instruction" placeholder="Например: чат учителей. Выписывай оплаты, что принести, дресс-код, даты собраний. Болтовню пропускай.">{{ c.instruction }}</textarea>
+<div class="row"><button name="action" value="save">Сохранить</button>
+<a class="btn sec" href="{{ url_for('messages', cid=c.id) }}">Переводы сообщений</a>
+<button name="action" value="delete" class="danger" onclick="return confirm('Удалить чат и все его сохранённые сообщения?')">Удалить</button></div>
+</form>
+{% else %}<div class="card mute">Пока ничего не выбрано.</div>{% endfor %}
+
+<div class="card">
+<h2>Добавить чат</h2>
+<button class="sec" id="load" type="button">Загрузить мои группы WhatsApp</button>
+<form id="addf" method="post" action="{{ url_for('chats_add') }}" style="display:none;margin-top:12px">{{ csrf_input() }}
+<label>Группа</label><select id="sel"></select>
+<input type="hidden" name="jid" id="jid"><input type="hidden" name="name" id="gname">
+<label>Инструкция</label><textarea name="instruction" placeholder="Что важно в этом чате?"></textarea>
+<button>Добавить</button></form>
+<div id="msg" class="mute"></div>
+</div>
+<script>
+document.getElementById('load').onclick = async () => {
+  const m = document.getElementById('msg'); m.textContent = 'Загружаем…';
+  const r = await fetch('/api/groups'); const j = await r.json();
+  if(j.error){m.textContent='Не удалось получить группы. Проверьте, что WhatsApp подключён.';return;}
+  const sel = document.getElementById('sel'); sel.innerHTML='';
+  j.groups.forEach(g=>{const o=document.createElement('option');o.value=g.jid;o.textContent=g.name;sel.appendChild(o);});
+  const upd=()=>{const o=sel.selectedOptions[0];if(o){document.getElementById('jid').value=o.value;document.getElementById('gname').value=o.textContent;}};
+  sel.onchange=upd;upd();
+  document.getElementById('addf').style.display='block';
+  m.textContent = j.groups.length ? '' : 'Групп не найдено.';
+};
+</script>
+{% endblock %}

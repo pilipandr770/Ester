@@ -1,0 +1,64 @@
+# Боевой запуск за Traefik (VPS): docker compose -f docker-compose.prod.yml up -d --build
+# Evolution берётся готовый (общий, по EVOLUTION_URL), свой не поднимаем.
+x-esther: &esther
+  build: .
+  env_file: .env
+  environment:
+    DATABASE_URL: postgresql://esther:${DB_PASSWORD:?задайте DB_PASSWORD в .env}@db:5432/esther
+    FLASK_APP: app.py
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: esther
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?задайте DB_PASSWORD в .env}
+      POSTGRES_DB: esther
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U esther -d esther"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  migrate:
+    <<: *esther
+    command: flask db upgrade
+    restart: "no"
+    depends_on:
+      db: {condition: service_healthy}
+
+  web:
+    <<: *esther
+    command: gunicorn -b 0.0.0.0:8000 -w 2 --timeout 120 app:app
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    networks: [default, traefik]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik
+      - traefik.http.routers.esther.rule=Host(`${ESTHER_HOST:?задайте ESTHER_HOST в .env}`)
+      - traefik.http.routers.esther.entrypoints=websecure
+      - traefik.http.routers.esther.tls.certresolver=letsencrypt
+      - traefik.http.services.esther.loadbalancer.server.port=8000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  worker:
+    <<: *esther
+    command: python worker.py
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+
+networks:
+  traefik:
+    external: true
+
+volumes:
+  pgdata:
