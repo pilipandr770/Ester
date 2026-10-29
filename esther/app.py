@@ -108,7 +108,7 @@ def fromjson(s):
 @app.route("/legal/<doc>/<lang>")
 def legal(doc, lang):
     from legal_texts import LEGAL
-    if doc not in LEGAL or lang not in ("ru", "he"):
+    if doc not in LEGAL or lang not in ("ru", "de"):
         abort(404)
     title, sections = LEGAL[doc][lang]
     vals = dict(company=Config.COMPANY_NAME, company_id=Config.COMPANY_ID,

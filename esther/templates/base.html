@@ -44,6 +44,6 @@ ul.clean{padding-left:20px;margin:6px 0}
 <div class="wrap">
 {% with m = get_flashed_messages(with_categories=true) %}{% for c,t in m %}<div class="flash {{c}}">{{t}}</div>{% endfor %}{% endwith %}
 {% block body %}{% endblock %}
-<p class="mute" style="margin:40px 0">Эстер · переводы и саммари родительских чатов · <a href="{{ url_for('legal', doc='terms', lang='ru') }}">Условия</a> · <a href="{{ url_for('legal', doc='privacy', lang='ru') }}">Конфиденциальность</a> · <a href="{{ url_for('legal', doc='privacy', lang='he') }}">עברית</a></p>
+<p class="mute" style="margin:40px 0">Эстер · переводы и саммари родительских чатов · <a href="{{ url_for('legal', doc='terms', lang='ru') }}">Условия</a> · <a href="{{ url_for('legal', doc='privacy', lang='ru') }}">Конфиденциальность</a> · <a href="{{ url_for('legal', doc='imprint', lang='de') }}">Impressum</a> · <a href="{{ url_for('legal', doc='privacy', lang='de') }}">Deutsch</a></p>
 </div>
 </body></html>

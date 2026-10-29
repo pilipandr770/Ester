@@ -18,6 +18,7 @@ UTC = timezone.utc
 def test_validate_config_fails_in_production(monkeypatch):
     monkeypatch.setattr(config.Config, "APP_ENV", "production")
     monkeypatch.setattr(config.Config, "SECRET_KEY", "dev")
+    monkeypatch.setattr(config.Config, "COMPANY_NAME", "")  # не зависеть от локального .env
     with pytest.raises(RuntimeError) as e:
         config.validate_config()
     assert "SECRET_KEY" in str(e.value) and "COMPANY_NAME" in str(e.value)

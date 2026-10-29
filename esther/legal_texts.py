@@ -1,50 +1,78 @@
-"""Черновики юридических страниц (иврит / русский) для пилота в Израиле.
-ВАЖНО: это шаблоны, не юридическая консультация. Перед запуском их должен
-проверить израильский юрист (Privacy Protection Law 5741-1981 с поправкой 13,
-Consumer Protection Law, регистрация базы данных при необходимости).
-Плейсхолдеры {company}, {company_id}, {address}, {email} берутся из .env."""
+"""Черновики юридических страниц (русский / немецкий) для оператора в Германии.
+ВАЖНО: это шаблоны, не юридическая консультация. Перед приёмом клиентов их должен
+проверить юрист по ИТ-праву/защите данных (DSGVO, BDSG, TDDDG, DDG, BGB, PAngV, VSBG).
+Плейсхолдеры {company}, {company_id} (USt-IdNr.), {address}, {email}, {retention_days},
+{trial_days} берутся из .env."""
 
 LEGAL = {
     "privacy": {
         "ru": ("Политика конфиденциальности", [
-            ("Кто мы", "Сервис «Эстер» предоставляет {company} (рег. № {company_id}, {address}), далее «Оператор». Контакт по вопросам данных: {email}."),
-            ("Что мы обрабатываем", "Адрес электронной почты и настройки аккаунта; сообщения (текст, подписи, расшифровки фото и голосовых) только из тех групп WhatsApp, которые вы сами выбрали; результаты перевода и разборов; события календаря. Личные переписки и невыбранные группы не читаются и не сохраняются."),
-            ("Зачем", "Чтобы переводить сообщения на русский, делать вечерние разборы, добавлять даты в календарь и отправлять напоминания. Мы не продаём данные и не используем их для рекламы."),
-            ("Другие участники чатов", "Выбранные группы содержат сообщения других людей, в том числе сведения о детях. Подключая группу, вы подтверждаете, что делаете это для личного использования как родитель и не передаёте результаты третьим лицам. Оператор обрабатывает эти сообщения только как ваш технический помощник."),
-            ("Поставщики и передача за границу", "Для перевода и расшифровки текст, изображения и аудио передаются поставщикам ИИ (Anthropic, OpenAI), для оплаты — платёжному провайдеру, для хранения — хостинг-провайдеру. Часть из них находится за пределами Израиля. Передача осуществляется только в объёме, необходимом для работы сервиса."),
-            ("Хранение", "Сообщения хранятся {retention_days} дней, затем удаляются автоматически. События и разборы хранятся, пока действует аккаунт. При удалении аккаунта все данные и подключение WhatsApp удаляются."),
-            ("Ваши права", "Вы можете запросить доступ к данным, исправление и удаление, написав на {email}. Вы также можете удалить аккаунт самостоятельно в «Настройках». Жалоба возможна в Управление защиты частной жизни Израиля (PPA)."),
-            ("Безопасность", "Доступ к данным ограничен, соединение защищено шифрованием, адрес шлюза WhatsApp не опубликован. Ни одна система не даёт абсолютной защиты; о существенных инцидентах мы сообщим в порядке, предусмотренном законом."),
+            ("Ответственное лицо", "Ответственный по смыслу DSGVO: {company}, {address}, USt-IdNr. {company_id}, e-mail: {email}. Сервис «Эстер», далее «Сервис»."),
+            ("Какие данные мы обрабатываем", "Адрес электронной почты, хэш пароля и настройки аккаунта; данные подписки (платёжные данные обрабатывает Stripe, мы их не видим); сообщения (текст, подписи, расшифровки фото и голосовых) только из тех групп WhatsApp, которые вы выбрали сами; результаты перевода и разборов; события календаря; технические журналы (IP-адрес, время запроса) для безопасности. Личные переписки и невыбранные группы не читаются и не сохраняются."),
+            ("Цели и правовые основания", "Исполнение договора об использовании Сервиса: перевод, вечерний разбор, календарь, напоминания, подписка (ст. 6 абз. 1 п. b DSGVO). Безопасность и защита от злоупотреблений, технические журналы (ст. 6 абз. 1 п. f DSGVO). Выполнение налоговых и бухгалтерских обязанностей (ст. 6 абз. 1 п. c DSGVO). Мы не продаём данные и не используем их для рекламы."),
+            ("Другие участники чатов и дети", "Выбранные группы содержат сообщения других людей, в том числе сведения о детях. Подключая группу, вы подтверждаете, что делаете это для личного использования как родитель, вправе обрабатывать эти сообщения и не передаёте результаты третьим лицам. Оператор обрабатывает содержимое чатов только по вашему поручению и только для работы Сервиса, не использует его для собственных целей и не обучает на нём модели."),
+            ("Получатели и подрядчики", "Для работы Сервиса мы привлекаем подрядчиков по договору об обработке данных (ст. 28 DSGVO): Anthropic (перевод и анализ текста и изображений), OpenAI (расшифровка голосовых сообщений), Stripe (оплата подписки), хостинг-провайдер (Hostinger, серверы в ЕС) и почтовый провайдер для служебных писем. Данные передаются только в объёме, необходимом для работы Сервиса."),
+            ("Передача в третьи страны", "Anthropic, OpenAI и Stripe могут обрабатывать данные в США. Передача основана на решении Еврокомиссии об адекватности (EU-US Data Privacy Framework) при наличии сертификации получателя либо на стандартных договорных условиях ЕС (ст. 44 и след. DSGVO)."),
+            ("Срок хранения", "Сообщения хранятся {retention_days} дней, затем удаляются автоматически. События и разборы хранятся, пока действует аккаунт. При удалении аккаунта все данные и подключение WhatsApp удаляются, кроме сведений, которые мы обязаны хранить по закону (например, счета и платёжные данные: до 10 лет по § 147 AO, § 257 HGB). Технические журналы хранятся не дольше, чем необходимо для обеспечения безопасности."),
+            ("Ваши права", "Вы вправе: получить информацию о данных (ст. 15), исправить (ст. 16), удалить (ст. 17), ограничить обработку (ст. 18), получить данные в машиночитаемом виде (ст. 20; выгрузка доступна в «Настройках»), возразить против обработки (ст. 21) и отозвать согласие. Запросы: {email}. Удалить аккаунт можно самостоятельно в «Настройках»."),
+            ("Жалоба в надзорный орган", "Вы можете подать жалобу в надзорный орган, например: Der Hessische Beauftragte für Datenschutz und Informationsfreiheit (HBDI), Gustav-Stresemann-Ring 1, 65189 Wiesbaden, или в орган по месту вашего проживания."),
+            ("Cookies", "Мы используем только технически необходимые cookies (сессия входа и защита от подделки запросов, CSRF). Согласие на них не требуется (§ 25 абз. 2 TDDDG). Аналитику и рекламные cookies мы не применяем."),
+            ("Безопасность", "Соединение защищено шифрованием (HTTPS), доступ к данным ограничен, адрес шлюза WhatsApp не опубликован. Ни одна система не даёт абсолютной защиты; об инцидентах мы сообщаем в порядке, предусмотренном законом (ст. 33, 34 DSGVO)."),
+            ("Автоматизированные решения", "Переводы и разборы формирует ИИ. Решений, имеющих для вас юридические последствия, Сервис не принимает (ст. 22 DSGVO)."),
         ]),
-        "he": ("מדיניות פרטיות", [
-            ("מי אנחנו", "שירות «אסתר» מופעל על ידי {company} (ח.פ. {company_id}, {address}), להלן «המפעיל». לפניות בנושא מידע אישי: {email}."),
-            ("איזה מידע אנו מעבדים", "כתובת דוא״ל והגדרות חשבון; הודעות (טקסט, כיתובים, תמלול תמונות והודעות קוליות) מקבוצות הוואטסאפ שבחרתם בעצמכם בלבד; תוצאות תרגום וסיכומים; אירועי יומן. שיחות פרטיות וקבוצות שלא נבחרו אינן נקראות ואינן נשמרות."),
-            ("מטרת העיבוד", "תרגום הודעות לרוסית, סיכום ערב, הוספת תאריכים ליומן ושליחת תזכורות. איננו מוכרים מידע ואיננו משתמשים בו לפרסום."),
-            ("משתתפים אחרים בקבוצות", "הקבוצות שנבחרו כוללות הודעות של אנשים אחרים, לרבות מידע על ילדים. בחיבור קבוצה אתם מאשרים שהדבר נעשה לשימוש אישי שלכם כהורים ושלא תעבירו את התוצרים לצד שלישי. המפעיל מעבד הודעות אלו אך ורק כעוזר טכני מטעמכם."),
-            ("ספקים והעברה לחו״ל", "לצורך תרגום ותמלול, טקסט, תמונות ואודיו מועברים לספקי בינה מלאכותית (Anthropic, OpenAI), לצורך תשלום - לספק סליקה, ולצורך אחסון - לספק אחסון. חלק מהם נמצאים מחוץ לישראל. ההעברה מתבצעת בהיקף הנדרש להפעלת השירות בלבד."),
-            ("שמירת מידע", "הודעות נשמרות {retention_days} ימים ונמחקות אוטומטית. אירועים וסיכומים נשמרים כל עוד החשבון פעיל. עם מחיקת החשבון נמחקים כל המידע והחיבור לוואטסאפ."),
-            ("זכויותיכם", "ניתן לבקש עיון, תיקון ומחיקה של מידע בפנייה אל {email}, או למחוק את החשבון בעצמכם בהגדרות. ניתן להגיש תלונה לרשות להגנת הפרטיות."),
-            ("אבטחת מידע", "הגישה למידע מוגבלת והתקשורת מוצפנת. אין מערכת חסינה לחלוטין; על אירועי אבטחה מהותיים נודיע בהתאם לדין."),
+        "de": ("Datenschutzerklärung", [
+            ("Verantwortlicher", "Verantwortlich im Sinne der DSGVO ist {company}, {address}, USt-IdNr. {company_id}, E-Mail: {email}. Der Dienst „Эстер“ (Esther) wird nachfolgend „Dienst“ genannt."),
+            ("Welche Daten wir verarbeiten", "E-Mail-Adresse, Passwort-Hash und Kontoeinstellungen; Abonnementdaten (Zahlungsdaten verarbeitet Stripe, wir sehen sie nicht); Nachrichten (Text, Bildunterschriften, Transkripte von Fotos und Sprachnachrichten) ausschließlich aus den WhatsApp-Gruppen, die Sie selbst ausgewählt haben; Übersetzungen und Zusammenfassungen; Kalenderereignisse; technische Protokolle (IP-Adresse, Zeitpunkt der Anfrage) zur Sicherheit. Private Chats und nicht ausgewählte Gruppen werden weder gelesen noch gespeichert."),
+            ("Zwecke und Rechtsgrundlagen", "Vertragserfüllung zur Bereitstellung des Dienstes: Übersetzung, Abendzusammenfassung, Kalender, Erinnerungen, Abonnement (Art. 6 Abs. 1 lit. b DSGVO). Sicherheit und Missbrauchsabwehr, technische Protokolle (Art. 6 Abs. 1 lit. f DSGVO). Erfüllung steuer- und handelsrechtlicher Pflichten (Art. 6 Abs. 1 lit. c DSGVO). Wir verkaufen keine Daten und nutzen sie nicht für Werbung."),
+            ("Andere Chat-Teilnehmer und Kinder", "Die ausgewählten Gruppen enthalten Nachrichten anderer Personen, auch Angaben zu Kindern. Mit dem Verbinden einer Gruppe bestätigen Sie, dass Sie dies als Elternteil für persönliche Zwecke tun, zur Verarbeitung dieser Nachrichten berechtigt sind und die Ergebnisse nicht an Dritte weitergeben. Der Betreiber verarbeitet die Chat-Inhalte nur in Ihrem Auftrag und nur zum Betrieb des Dienstes, nicht für eigene Zwecke und nicht zum Training von Modellen."),
+            ("Empfänger und Auftragsverarbeiter", "Zum Betrieb des Dienstes setzen wir Auftragsverarbeiter nach Art. 28 DSGVO ein: Anthropic (Übersetzung und Analyse von Text und Bildern), OpenAI (Transkription von Sprachnachrichten), Stripe (Zahlungsabwicklung), einen Hosting-Anbieter (Hostinger, Server in der EU) und einen E-Mail-Anbieter für Systemnachrichten. Die Weitergabe erfolgt nur im erforderlichen Umfang."),
+            ("Drittlandübermittlung", "Anthropic, OpenAI und Stripe können Daten in den USA verarbeiten. Die Übermittlung stützt sich auf den Angemessenheitsbeschluss der EU-Kommission (EU-US Data Privacy Framework), sofern der Empfänger zertifiziert ist, andernfalls auf EU-Standardvertragsklauseln (Art. 44 ff. DSGVO)."),
+            ("Speicherdauer", "Nachrichten werden {retention_days} Tage gespeichert und danach automatisch gelöscht. Ereignisse und Zusammenfassungen bleiben gespeichert, solange das Konto besteht. Bei Löschung des Kontos werden alle Daten und die WhatsApp-Verbindung gelöscht, mit Ausnahme von Daten, die wir gesetzlich aufbewahren müssen (z. B. Rechnungen und Zahlungsdaten: bis zu 10 Jahre nach § 147 AO, § 257 HGB). Technische Protokolle werden nicht länger gespeichert, als es für die Sicherheit erforderlich ist."),
+            ("Ihre Rechte", "Sie haben das Recht auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20; ein Export steht in den Einstellungen bereit) und Widerspruch (Art. 21) sowie auf Widerruf erteilter Einwilligungen. Anfragen: {email}. Das Konto können Sie selbst in den Einstellungen löschen."),
+            ("Beschwerderecht", "Sie können sich bei einer Aufsichtsbehörde beschweren, z. B. beim Hessischen Beauftragten für Datenschutz und Informationsfreiheit (HBDI), Gustav-Stresemann-Ring 1, 65189 Wiesbaden, oder bei der Behörde an Ihrem Wohnort."),
+            ("Cookies", "Wir verwenden ausschließlich technisch notwendige Cookies (Login-Sitzung und CSRF-Schutz). Eine Einwilligung ist hierfür nicht erforderlich (§ 25 Abs. 2 TDDDG). Analyse- oder Werbe-Cookies setzen wir nicht ein."),
+            ("Sicherheit", "Die Verbindung ist per HTTPS verschlüsselt, der Zugriff auf Daten ist beschränkt, die Adresse des WhatsApp-Gateways ist nicht öffentlich. Kein System ist absolut sicher; über Vorfälle informieren wir nach den gesetzlichen Vorgaben (Art. 33, 34 DSGVO)."),
+            ("Automatisierte Verarbeitung", "Übersetzungen und Zusammenfassungen erstellt eine KI. Entscheidungen mit rechtlicher Wirkung Ihnen gegenüber trifft der Dienst nicht (Art. 22 DSGVO)."),
         ]),
     },
     "terms": {
         "ru": ("Условия использования", [
-            ("Услуга", "«Эстер» переводит и резюмирует сообщения выбранных вами групп WhatsApp и создаёт напоминания. Оператор: {company} (рег. № {company_id}). Подписка: 10 € в месяц, первые {trial_days} дней бесплатно, отмена в любой момент в разделе «Подписка»."),
-            ("Это помощник, а не замена", "Переводы и разборы делает ИИ и они могут содержать ошибки или пропуски. Важные сведения (оплаты, сроки, безопасность ребёнка) проверяйте по оригиналу или у школы/сада. Оператор не отвечает за убытки из-за неточного перевода или пропущенного сообщения."),
+            ("Услуга и оператор", "«Эстер» переводит и резюмирует сообщения выбранных вами групп WhatsApp и создаёт напоминания. Оператор: {company}, {address}, USt-IdNr. {company_id}. Договор заключается с потребителем или предпринимателем на русском или немецком языке."),
+            ("Цена и пробный период", "Подписка: 10 € в месяц. Первые {trial_days} дней бесплатно. Окончательная цена, включая применимый НДС, показывается при оформлении оплаты. Оплата списывается ежемесячно через Stripe; подписка продлевается автоматически и отменяется в любой момент в разделе «Подписка», доступ сохраняется до конца оплаченного периода."),
+            ("Право на отказ от договора (потребителям)", "Если вы потребитель, вы вправе в течение 14 дней без объяснения причин отказаться от договора. Срок начинается в день заключения договора. Для отказа сообщите нам о своём решении явным заявлением, например письмом на {email}. Для соблюдения срока достаточно отправить заявление до его истечения. Если вы просите начать оказание услуги до окончания срока отказа, то при отказе вы оплачиваете соразмерную часть уже оказанных услуг (§ 357a BGB). Право на отказ прекращается, если услуга полностью оказана с вашего явного согласия и после вашего подтверждения, что вы теряете право на отказ (§ 356 абз. 4 BGB)."),
+            ("Это помощник, а не замена", "Переводы и разборы делает ИИ, и они могут содержать ошибки или пропуски. Важные сведения (оплаты, сроки, безопасность ребёнка) проверяйте по оригиналу или у школы/сада. Оператор отвечает за ущерб по закону; при простой неосторожности — только за нарушение существенных договорных обязанностей и в пределах типичного, предсказуемого ущерба. Ответственность за умысел, грубую неосторожность, вред жизни, здоровью и в иных случаях, когда закон не допускает ограничения, не исключается."),
             ("WhatsApp", "Сервис подключается к вашему аккаунту WhatsApp неофициальным способом, как «связанное устройство». Это может противоречить условиям WhatsApp и приводить к ограничению номера. Подключая аккаунт, вы принимаете этот риск. Мы читаем только выбранные группы и ничего не отправляем в них."),
             ("Ваши обязанности", "Подключайте только свой аккаунт и только группы, в которых вы участвуете как родитель. Не используйте сервис для слежки за людьми и не публикуйте материалы чатов."),
-            ("Оплата и отмена", "Оплата списывается ежемесячно. После отмены доступ сохраняется до конца оплаченного периода. Возвраты — в порядке, предусмотренном законом о защите потребителей Израиля."),
-            ("Ответственность и право", "Услуга предоставляется «как есть» в пределах, допускаемых законом. Применяется право Израиля; споры рассматриваются в компетентном суде Израиля."),
+            ("Изменения и прекращение", "Вы можете удалить аккаунт в любой момент в «Настройках». Мы вправе расторгнуть договор по уважительной причине, например при злоупотреблении. Об изменении условий мы сообщим заранее по e-mail."),
+            ("Применимое право", "Применяется право Германии за исключением Конвенции ООН о купле-продаже. Для потребителей сохраняют силу императивные нормы страны их постоянного проживания."),
             ("Контакт", "{email}"),
         ]),
-        "he": ("תנאי שימוש", [
-            ("השירות", "«אסתר» מתרגמת ומסכמת הודעות מקבוצות הוואטסאפ שבחרתם ויוצרת תזכורות. המפעיל: {company} (ח.פ. {company_id}). מנוי: 10 € לחודש, {trial_days} הימים הראשונים ללא תשלום, ניתן לבטל בכל עת בעמוד «מנוי»."),
-            ("עוזר ולא תחליף", "התרגום והסיכום נעשים על ידי בינה מלאכותית ועלולים לכלול טעויות או השמטות. מידע חשוב (תשלומים, מועדים, בטיחות הילד) יש לבדוק מול המקור או מול בית הספר/הגן. המפעיל אינו אחראי לנזק שנגרם מתרגום לא מדויק או מהודעה שלא סוכמה."),
-            ("וואטסאפ", "השירות מתחבר לחשבון הוואטסאפ שלכם בדרך לא רשמית, כ«מכשיר מקושר». הדבר עלול לסתור את תנאי WhatsApp ולגרום להגבלת המספר. בחיבור החשבון אתם מקבלים על עצמכם סיכון זה. אנו קוראים רק קבוצות שנבחרו ואיננו שולחים בהן דבר."),
-            ("חובותיכם", "יש לחבר רק את החשבון שלכם ורק קבוצות שבהן אתם חברים כהורים. אין להשתמש בשירות למעקב אחר אנשים ואין לפרסם תכנים מהקבוצות."),
-            ("תשלום וביטול", "התשלום מחויב מדי חודש. לאחר ביטול הגישה נשמרת עד סוף התקופה ששולמה. החזרים - בהתאם לחוק הגנת הצרכן."),
-            ("אחריות ודין", "השירות ניתן «כפי שהוא» במידה שהדין מתיר. על ההסכם יחול הדין הישראלי ולבתי המשפט המוסמכים בישראל סמכות שיפוט."),
-            ("יצירת קשר", "{email}"),
+        "de": ("Nutzungsbedingungen", [
+            ("Leistung und Anbieter", "„Эстер“ (Esther) übersetzt und fasst Nachrichten aus den von Ihnen ausgewählten WhatsApp-Gruppen zusammen und erstellt Erinnerungen. Anbieter: {company}, {address}, USt-IdNr. {company_id}. Der Vertrag wird mit Verbrauchern oder Unternehmern in russischer oder deutscher Sprache geschlossen."),
+            ("Preis und Testzeitraum", "Abonnement: 10 € pro Monat. Die ersten {trial_days} Tage sind kostenlos. Der endgültige Preis einschließlich gesetzlicher Umsatzsteuer wird im Bezahlvorgang angezeigt. Die Zahlung erfolgt monatlich über Stripe; das Abonnement verlängert sich automatisch und kann jederzeit im Bereich „Abonnement“ gekündigt werden, der Zugang bleibt bis zum Ende des bezahlten Zeitraums bestehen."),
+            ("Widerrufsrecht für Verbraucher", "Sind Sie Verbraucher, haben Sie das Recht, binnen 14 Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beginnt mit dem Tag des Vertragsabschlusses. Um Ihr Widerrufsrecht auszuüben, müssen Sie uns ({company}, {address}, E-Mail: {email}) mittels einer eindeutigen Erklärung (z. B. E-Mail) über Ihren Entschluss informieren. Zur Wahrung der Frist genügt die Absendung vor Ablauf der Frist. Verlangen Sie, dass die Leistung während der Widerrufsfrist beginnt, so haben Sie im Fall des Widerrufs einen angemessenen Betrag für die bis dahin erbrachten Leistungen zu zahlen (§ 357a BGB). Das Widerrufsrecht erlischt, wenn wir die Leistung vollständig erbracht haben und Sie ausdrücklich zugestimmt und bestätigt haben, dass Sie Ihr Widerrufsrecht bei vollständiger Vertragserfüllung verlieren (§ 356 Abs. 4 BGB)."),
+            ("Hilfsmittel, kein Ersatz", "Übersetzungen und Zusammenfassungen erstellt eine KI und sie können Fehler oder Auslassungen enthalten. Wichtige Angaben (Zahlungen, Fristen, Sicherheit des Kindes) prüfen Sie bitte anhand des Originals oder bei Schule bzw. Kita. Wir haften nach den gesetzlichen Vorschriften; bei einfacher Fahrlässigkeit nur für die Verletzung wesentlicher Vertragspflichten und begrenzt auf den vertragstypischen, vorhersehbaren Schaden. Die Haftung für Vorsatz, grobe Fahrlässigkeit, Schäden an Leben, Körper und Gesundheit sowie in sonstigen Fällen zwingender gesetzlicher Haftung bleibt unberührt."),
+            ("WhatsApp", "Der Dienst verbindet sich auf inoffiziellem Weg als „verknüpftes Gerät“ mit Ihrem WhatsApp-Konto. Das kann gegen die Nutzungsbedingungen von WhatsApp verstoßen und zu einer Sperrung der Nummer führen. Mit dem Verbinden Ihres Kontos nehmen Sie dieses Risiko in Kauf. Wir lesen nur ausgewählte Gruppen und senden darin nichts."),
+            ("Ihre Pflichten", "Verbinden Sie nur Ihr eigenes Konto und nur Gruppen, in denen Sie als Elternteil Mitglied sind. Nutzen Sie den Dienst nicht zur Überwachung von Personen und veröffentlichen Sie keine Chat-Inhalte."),
+            ("Änderungen und Beendigung", "Sie können Ihr Konto jederzeit in den Einstellungen löschen. Wir können den Vertrag aus wichtigem Grund kündigen, z. B. bei Missbrauch. Änderungen dieser Bedingungen teilen wir Ihnen vorab per E-Mail mit."),
+            ("Anwendbares Recht", "Es gilt deutsches Recht unter Ausschluss des UN-Kaufrechts. Zwingende Verbraucherschutzvorschriften des Staates, in dem Sie Ihren gewöhnlichen Aufenthalt haben, bleiben unberührt."),
+            ("Kontakt", "{email}"),
+        ]),
+    },
+    "imprint": {
+        "ru": ("Выходные данные (Impressum)", [
+            ("Информация по § 5 DDG", "{company}\n{address}"),
+            ("Контакт", "E-mail: {email}"),
+            ("Налог на добавленную стоимость", "Идентификационный номер плательщика НДС по § 27a UStG: {company_id}"),
+            ("Ответственный за содержание", "{company}, адрес указан выше."),
+            ("Урегулирование споров с потребителями", "Мы не обязаны и не готовы участвовать в процедуре урегулирования споров перед потребительской арбитражной комиссией (§ 36 VSBG)."),
+        ]),
+        "de": ("Impressum", [
+            ("Angaben gemäß § 5 DDG", "{company}\n{address}"),
+            ("Kontakt", "E-Mail: {email}"),
+            ("Umsatzsteuer", "Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: {company_id}"),
+            ("Verantwortlich für den Inhalt", "{company}, Anschrift wie oben."),
+            ("Verbraucherstreitbeilegung", "Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG)."),
         ]),
     },
 }
