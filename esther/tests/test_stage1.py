@@ -8,7 +8,7 @@ import evolution
 import pipeline
 import worker
 from config import Config
-from models import db, User, Chat, Message, WebhookJob
+from models import db, User, Chat, Message, WebhookJob, Digest
 from tests.helpers import post
 
 
@@ -263,3 +263,30 @@ def test_account_delete_removes_jobs(logged_in, monkeypatch):
     monkeypatch.setattr(evolution, "delete_instance", lambda n: None)
     post(client, "/account/delete", form_page="/settings")
     assert db.session.get(User, u.id) is None and WebhookJob.query.count() == 0
+
+
+# ---------- разбор по кнопке ----------
+
+def test_digest_now_digests_new_messages_only_once(logged_in, monkeypatch):
+    client, u = logged_in
+    c = Chat(user_id=u.id, jid="1@g.us", name="Сад")
+    db.session.add(c)
+    db.session.commit()
+    db.session.add(Message(chat_id=c.id, wa_id="d1", sender="Dana", original="שלום", translation="привет"))
+    db.session.commit()
+    calls = []
+    monkeypatch.setattr(ai, "digest", lambda *a, **k: calls.append(1) or
+                        {"summary": "Итог", "important": ["Взять воду"], "terms": [], "events": []})
+
+    r = post(client, "/digest/now", form_page="/dashboard", follow_redirects=True)
+    assert "Разбор готов" in r.get_data(as_text=True) and "Итог" in r.get_data(as_text=True)
+    assert Digest.query.filter_by(user_id=u.id).count() == 1
+    assert Message.query.filter_by(wa_id="d1").one().digested is True
+
+    r = post(client, "/digest/now", form_page="/dashboard", follow_redirects=True)
+    assert "Новых сообщений для разбора нет" in r.get_data(as_text=True)
+    assert len(calls) == 1  # повторно ИИ не вызывался
+
+
+def test_digest_now_requires_login(client):
+    assert client.post("/digest/now").status_code in (302, 400, 401)

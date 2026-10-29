@@ -354,6 +354,24 @@ def dashboard():
     return render_template("dashboard.html", digests=digests, chat_names=chat_names, upcoming=upcoming)
 
 
+@app.route("/digest/now", methods=["POST"])
+@subscribed
+@limiter.limit("6 per hour", methods=["POST"])
+def digest_now():
+    """Разбор новых сообщений по запросу. Вечерний разбор от этого не пропускается:
+    он берёт только то, что придёт после."""
+    if not Message.query.join(Chat).filter(Chat.user_id == current_user.id, Chat.enabled.is_(True),
+                                           Message.digested.is_(False)).count():
+        flash("Новых сообщений для разбора нет.", "warn")
+        return redirect(url_for("dashboard"))
+    made, failed = pipeline.run_digest_for_user(current_user)
+    if made:
+        flash("Разбор готов: " + ", ".join(made) + ".", "ok")
+    if failed:
+        flash("Не удалось разобрать: " + ", ".join(failed) + ". Попробуйте через несколько минут.", "err")
+    return redirect(url_for("dashboard"))
+
+
 @app.route("/messages/<int:cid>")
 @subscribed
 def messages(cid):

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
-<h1>Лента</h1>
+<div class="row" style="align-items:center"><h1 style="margin:0">Лента</h1>
+<form method="post" action="{{ url_for('digest_now') }}" style="margin-left:auto">{{ csrf_input() }}<button class="sec" title="Разобрать накопившиеся сообщения, не дожидаясь вечера">Саммари сейчас</button></form></div>
 {% if not current_user.wa_connected %}
 <div class="flash warn">WhatsApp не подключён. <a href="{{ url_for('connect') }}">Подключить</a></div>{% endif %}
 
