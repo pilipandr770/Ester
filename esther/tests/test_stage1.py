@@ -159,6 +159,22 @@ def test_chat_limit(logged_in, monkeypatch):
     assert Chat.query.filter_by(user_id=u.id).count() == 2
 
 
+def test_chat_add_race_does_not_500(logged_in, monkeypatch):
+    from sqlalchemy.exc import IntegrityError
+    client, u = logged_in
+    real = db.session.commit
+    calls = []
+
+    def boom():
+        calls.append(1)
+        raise IntegrityError("insert", {}, Exception("dup"))
+
+    monkeypatch.setattr(db.session, "commit", boom)
+    r = post(client, "/chats/add", {"jid": "9@g.us", "name": "g"}, form_page="/settings")
+    monkeypatch.setattr(db.session, "commit", real)
+    assert calls and r.status_code == 302
+
+
 # ---------- отключение WhatsApp ----------
 
 def test_disconnect_triggers_single_email(make_user, monkeypatch):

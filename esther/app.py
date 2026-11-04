@@ -18,6 +18,7 @@ from flask_wtf.csrf import CSRFProtect, CSRFError, generate_csrf
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from markupsafe import Markup
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import billing
@@ -319,7 +320,10 @@ def chats_add():
             return redirect(url_for("chats"))
         db.session.add(Chat(user_id=current_user.id, jid=jid, name=name or jid,
                             instruction=request.form.get("instruction", "")[:INSTRUCTION_MAX]))
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:  # двойной клик: чат уже добавлен параллельным запросом
+            db.session.rollback()
     return redirect(url_for("chats"))
 
 
