@@ -8,7 +8,7 @@ import evolution
 import pipeline
 import worker
 from config import Config
-from models import db, User, Chat, Message, WebhookJob, Digest
+from models import db, User, Chat, Message, WebhookJob, Digest, Event
 from tests.helpers import post
 
 
@@ -275,10 +275,27 @@ def test_account_delete_removes_jobs(logged_in, monkeypatch):
     db.session.add(c)
     db.session.commit()
     pipeline.handle_webhook(u, _payload())
+    db.session.add(Digest(user_id=u.id, chat_id=c.id, summary="s"))
+    db.session.add(Event(user_id=u.id, chat_id=c.id, title="e", due=datetime.utcnow()))
+    db.session.commit()
     monkeypatch.setattr(billing, "cancel_subscriptions", lambda user: None)
     monkeypatch.setattr(evolution, "delete_instance", lambda n: None)
     post(client, "/account/delete", form_page="/settings")
     assert db.session.get(User, u.id) is None and WebhookJob.query.count() == 0
+    assert Digest.query.count() == 0 and Event.query.count() == 0
+
+
+def test_chat_delete_keeps_events_and_drops_digests(logged_in):
+    client, u = logged_in
+    c = Chat(user_id=u.id, jid="1@g.us", name="Сад")
+    db.session.add(c)
+    db.session.commit()
+    db.session.add(Digest(user_id=u.id, chat_id=c.id, summary="s"))
+    db.session.add(Event(user_id=u.id, chat_id=c.id, title="e", due=datetime.utcnow()))
+    db.session.commit()
+    post(client, f"/chats/{c.id}", {"action": "delete"}, form_page="/chats")
+    assert Chat.query.count() == 0 and Digest.query.count() == 0
+    assert Event.query.one().chat_id is None
 
 
 # ---------- разбор по кнопке ----------

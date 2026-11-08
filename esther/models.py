@@ -40,6 +40,7 @@ class User(UserMixin, db.Model):
     chats = db.relationship("Chat", backref="user", cascade="all, delete-orphan")
     events = db.relationship("Event", backref="user", cascade="all, delete-orphan")
     jobs = db.relationship("WebhookJob", backref="user", cascade="all, delete-orphan")
+    digests = db.relationship("Digest", backref="user", cascade="all, delete-orphan")
 
     def set_password(self, p):
         self.password_hash = generate_password_hash(p)
@@ -67,6 +68,8 @@ class Chat(db.Model):
     enabled = db.Column(db.Boolean, default=True)
     messages = db.relationship("Message", backref="chat", cascade="all, delete-orphan")
     jobs = db.relationship("WebhookJob", backref="chat", cascade="all, delete-orphan")
+    digests = db.relationship("Digest", backref="chat", cascade="all, delete-orphan")
+    events = db.relationship("Event", backref="chat")  # события календаря остаются, chat_id обнуляется
     __table_args__ = (db.UniqueConstraint("user_id", "jid"),)
 
 
